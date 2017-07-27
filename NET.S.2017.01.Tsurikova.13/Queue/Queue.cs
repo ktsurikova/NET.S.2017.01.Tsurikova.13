@@ -45,6 +45,8 @@ namespace Queue
 
         #endregion
 
+        #region enqueue, dequeue, peek
+
         public void Enqueue(T item)
         {
             if (count == capacity)
@@ -73,6 +75,10 @@ namespace Queue
             return array[0];
         }
 
+        #endregion
+
+        #region other methods
+
         public bool Contains(T item)
         {
             EqualityComparer<T> equialityComparer = EqualityComparer<T>.Default;
@@ -94,11 +100,11 @@ namespace Queue
         public void СоруТо(T[] array, int arrayIndex)
         {
             if (ReferenceEquals(array, null)) throw new ArgumentNullException($"{nameof(array)} is null");
-            if (arrayIndex < 0) throw new ArgumentException("arrayIndex can't be less than 0");
+            if (arrayIndex < 0) throw new ArgumentException($"{nameof(arrayIndex)} can't be less than 0");
             for (int i = 0; i < count; i++)
             {
                 if (arrayIndex + i >= array.Length) break;
-                array[arrayIndex + i] = this.array[count - i - 1];
+                array[arrayIndex + i] = this.array[i];
             }
         }
 
@@ -107,16 +113,48 @@ namespace Queue
             T[] newArray = new T[count];
             Array.Copy(array, newArray, count);
             return newArray;
-        }
+        } 
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public IEnumerator<T> GetEnumerator() => new QueueEnumerator(this);
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        #region enumerator
+
+        private struct QueueEnumerator : IEnumerator<T>
         {
-            return GetEnumerator();
-        }
+            private readonly Queue<T> queue;
+            private int index;
+
+            public QueueEnumerator(Queue<T> collection) : this()
+            {
+                queue = collection;
+                index = -1;
+            }
+
+            public bool MoveNext() => ++index < queue.Count;
+
+            public T Current
+            {
+                get
+                {
+                    if (index <= -1 || index >= queue.Count)
+                        throw new InvalidOperationException();
+                    return queue.array[index];
+                }
+            }
+
+            object IEnumerator.Current => Current;
+
+            public void Reset() => index = -1;
+
+            public void Dispose()
+            {
+            }
+        } 
+
+        #endregion
     }
 }
