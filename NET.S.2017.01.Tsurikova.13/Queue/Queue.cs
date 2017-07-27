@@ -57,6 +57,8 @@ namespace Queue
         {
             if (ReferenceEquals(collection, null))
                 throw new ArgumentNullException($"{nameof(collection)} is null");
+            array = new T[collection.Count()];
+            capacity = array.Length;
             foreach (var item in collection)
             {
                 Enqueue(item);
@@ -166,7 +168,7 @@ namespace Queue
             T[] newArray = new T[count];
             Array.Copy(array, newArray, count);
             return newArray;
-        } 
+        }
 
         #endregion
 
@@ -217,7 +219,7 @@ namespace Queue
             void IDisposable.Dispose()
             {
             }
-        } 
+        }
 
         #endregion
     }
