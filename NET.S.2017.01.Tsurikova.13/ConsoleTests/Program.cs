@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Fibonacci;
 using Queue;
+using Set;
 
 namespace ConsoleTests
 {
@@ -32,25 +33,275 @@ namespace ConsoleTests
             //queue.Clear();
             //Console.WriteLine(queue.Count);
 
-            foreach (var VARIABLE in FibonacciSequence.Generate(0))
+            //foreach (var VARIABLE in FibonacciSequence.Generate(0))
+            //{
+            //    Console.WriteLine(VARIABLE);
+            //}
+            //Console.WriteLine();
+            //foreach (var VARIABLE in FibonacciSequence.Generate(1))
+            //{
+            //    Console.WriteLine(VARIABLE);
+            //}
+            //Console.WriteLine();
+            //foreach (var VARIABLE in FibonacciSequence.Generate(10))
+            //{
+            //    Console.WriteLine(VARIABLE);
+            //}
+            //Console.WriteLine();
+            //foreach (var VARIABLE in FibonacciSequence.Generate(200))
+            //{
+            //    Console.WriteLine(VARIABLE);
+            //}
+
+            Set<Point> set = new Set<Point>(new[]{new Point(1,1), new Point(2,2),
+                new Point(3,3), new Point(3,3) });
+            //Set<Point> set = new Set<Point>();
+            //Set<Point> set = new Set<Point>(3);
+            Console.WriteLine(set);
+            Console.WriteLine("3+" + set.Count);
+            Console.WriteLine("false+" + set.Contains(null));
+            Console.WriteLine("true+" + set.Contains(new Point(1, 1)));
+            Console.WriteLine("false+" + set.Contains(new Point(4, 4)));
+            try
+            {
+                Console.WriteLine(set.Add(null));
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine("Exception " + e.Message);
+            }
+            Console.WriteLine("true+" + set.Add(new Point(4, 4)));
+            Console.WriteLine("true+" + set.Add(new Point(5, 5)));
+            Console.WriteLine("true+" + set.Add(new Point(6, 6)));
+            Console.WriteLine("true+" + set.Add(new Point(7, 7)));
+            Console.WriteLine("true+" + set.Add(new Point(8, 8)));
+            Console.WriteLine("false+" + set.Add(new Point(3, 3)));
+            Console.WriteLine("8 points: " + set);
+            Console.WriteLine("false+" + set.Remove(null));
+            Console.WriteLine("true+" + set.Remove(new Point(4, 4)));
+            Console.WriteLine("7 points: " + set);
+            Console.WriteLine("false+" + set.Remove(new Point(9, 9)));
+            Console.WriteLine("7 points: " + set);
+            Console.WriteLine("7+" + set.Count);
+            Console.WriteLine("true+" + set.SetEquals(set));
+            Console.WriteLine("true+" + set.SetEquals(new[]
+            {
+                new Point(1,1),
+                new Point(2,2),
+                new Point(3,3),
+                new Point(5,5),
+                new Point(6,6),
+                new Point(7,7),
+                new Point(8,8),
+            }));
+            Console.WriteLine("false+" + set.SetEquals(new[]
+            {
+                new Point(1,1),
+                new Point(3,3),
+                new Point(5,5),
+                new Point(6,6),
+                new Point(7,7),
+                new Point(8,8),
+            }));
+            Console.WriteLine("false+" + set.SetEquals(new[]
+            {
+                new Point(1,1),
+                new Point(2,2),
+                new Point(3,3),
+                new Point(5,5),
+                new Point(6,6),
+                new Point(7,7),
+                new Point(8,8),
+                new Point(9,9),
+            }));
+            set.IntersectWith(new[]
+            {
+                new Point(1,1),
+                new Point(2,2),
+                new Point(3,3),
+                new Point(6,6),
+                new Point(7,7),
+                new Point(9,9),
+                new Point(10,10),
+            });
+            Console.WriteLine("5 points: " + set);
+            set.IntersectWith(new[]
+            {
+                new Point(1,1),
+                new Point(2,2),
+                new Point(3,3),
+            });
+            Console.WriteLine("3 points: " + set);
+            set.UnionWith(new[]
+            {
+                new Point(4,4),
+                new Point(4,4),
+                new Point(4,4),
+            });
+            Console.WriteLine("4 points: " + set);
+            set.UnionWith(new[]
+            {
+                new Point(4,4),
+                new Point(5,5),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(7,7),
+            });
+            Console.WriteLine("7 points: " + set);
+            set.ExceptWith(new[]
+            {
+                new Point(10,10),
+                new Point(6,6),
+                new Point(-8,-9),
+                new Point(7,7),
+            });
+            Console.WriteLine("5 points: " + set);
+            set.SymmetricExceptWith(new[]
+            {
+                new Point(5,5),
+                new Point(6,6),
+                new Point(4,4),
+                new Point(7,7),
+            });
+            Console.WriteLine("5 points: " + set);
+            Console.WriteLine("true+" + set.Overlaps(new[]
+            {
+                new Point(5,5),
+                new Point(6,6),
+                new Point(4,4),
+                new Point(7,7),
+            }));
+            Console.WriteLine("false+" + set.Overlaps(new[]
+            {
+                new Point(50,50),
+                new Point(60,60),
+                new Point(-4,-4),
+                new Point(79,72),
+            }));
+            Console.WriteLine("true+" + set.Overlaps(new[]
+            {
+                null,
+                new Point(50,50),
+                null,
+                new Point(3,3),
+            }));
+            Console.WriteLine("false+" + set.IsSubsetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(-4,-4),
+                new Point(79,72),
+            }));
+            Console.WriteLine("true+" + set.IsSubsetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+                new Point(7,7),
+            }));
+            Console.WriteLine("true+" + set.IsSubsetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+                new Point(7,7),
+                new Point(8,8),
+            }));
+            Set<Point> emptySet = new Set<Point>();
+            Console.WriteLine("true+" + emptySet.IsProperSubsetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+                new Point(7,7),
+                new Point(8,8),
+            }));
+            Console.WriteLine("true+" + set.IsProperSubsetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+                new Point(7,7),
+                new Point(8,8),
+            }));
+            Console.WriteLine("false+" + set.IsProperSubsetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+                new Point(7,7),
+            }));
+            Console.WriteLine("false+" + set.IsProperSubsetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+            }));
+            Console.WriteLine("true+" + set.IsSupersetOf(emptySet));
+            Console.WriteLine("true+" + set.IsSupersetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+            }));
+            Console.WriteLine("false+" + set.IsSupersetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+                new Point(7,7),
+                new Point(8,8),
+            }));
+            Console.WriteLine("true+" + set.IsSupersetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+                new Point(7,7),
+            }));
+            Console.WriteLine("true+" + set.IsProperSupersetOf(emptySet));
+            Console.WriteLine("false+" + set.IsProperSupersetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+                new Point(7,7),
+            }));
+            Console.WriteLine("true+" + set.IsProperSupersetOf(new[]
+            {
+                new Point(3,3),
+                new Point(6,6),
+                new Point(1,1),
+                new Point(2,2),
+            }));
+            Console.WriteLine("Enumerator");
+            foreach (var item in set)
+            {
+                Console.WriteLine(item);
+            }
+            Console.WriteLine("end enumerator");
+            Point[] points = new Point[6];
+            set.CopyTo(points, 3);
+            Console.WriteLine("after copying 3 empty 3 point");
+            foreach (var VARIABLE in points)
             {
                 Console.WriteLine(VARIABLE);
             }
-            Console.WriteLine();
-            foreach (var VARIABLE in FibonacciSequence.Generate(1))
-            {
-                Console.WriteLine(VARIABLE);
-            }
-            Console.WriteLine();
-            foreach (var VARIABLE in FibonacciSequence.Generate(10))
-            {
-                Console.WriteLine(VARIABLE);
-            }
-            Console.WriteLine();
-            foreach (var VARIABLE in FibonacciSequence.Generate(200))
-            {
-                Console.WriteLine(VARIABLE);
-            }
+            Console.WriteLine("end copying");
+            //Set<Point> cloneSet = (Set<Point>)set.Clone();
+            //Console.WriteLine("Clone " + cloneSet);
+            //cloneSet.Add(new Point(9, 9));
+            //Console.WriteLine("set " + set);
+            //Console.WriteLine("clone have 1 more " + cloneSet);
+            set.Clear();
+            Console.WriteLine("0 points: " + set);
+            Console.WriteLine("0+" + set.Count);
 
             Console.ReadLine();
         }

@@ -33,7 +33,7 @@ namespace Queue
         /// </summary>
         public Queue()
         {
-            array = new T[0];
+            array = new T[capacity];
         }
 
         /// <summary>
