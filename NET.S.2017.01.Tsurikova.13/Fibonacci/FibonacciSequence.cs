@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,22 +15,18 @@ namespace Fibonacci
         /// <summary>
         /// generate sequence of fibonacci numbers
         /// </summary>
-        /// <param name="number">number to which sequence to be generated</param>
+        /// <param name="number">number of elements in sequence to be generated</param>
         /// <returns>sequence of numbers</returns>
         /// <exception cref="ArgumentException">throws when number is negative</exception>
-        public static IEnumerable<int> Generate(int number)
+        public static IEnumerable<BigInteger> Generate(int number)
         {
             if (number < 0) throw new ArgumentException($"{nameof(number)} can't be negative");
-            int a = 0;
-            int b = 1;
+            BigInteger a = -1;
+            BigInteger b = 1;
 
-            yield return a;
-            if (number == 0) yield break;
-            yield return b;
-
-            while (a + b <= number)
+            for (int i = 0; i < number; i++)
             {
-                int sum = a + b;
+                BigInteger sum = a + b;
                 a = b;
                 b = sum;
                 yield return sum;
