@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleTests
 {
-    class Point : IEquatable<Point>
+    public class Point //: IEquatable<Point>
     {
         public double X { get; set; }
         public double Y { get; set; }
@@ -22,22 +22,16 @@ namespace ConsoleTests
             Y = y;
         }
 
-        public bool Equals(Point other)
-        {
-            if (ReferenceEquals(other, null)) return false;
+        //public bool Equals(Point other)
+        //{
+        //    if (ReferenceEquals(other, null)) return false;
 
-            if (ReferenceEquals(other, this)) return true;
+        //    if (ReferenceEquals(other, this)) return true;
 
-            return (Math.Abs(other.X - X) < EPSILONE && Math.Abs(other.Y - Y) < EPSILONE);
-        }
+        //    return (Math.Abs(other.X - X) < EPSILONE && Math.Abs(other.Y - Y) < EPSILONE);
+        //}
 
         public override string ToString() => $"({X}, {Y})";
-
-        public bool Equals(Point x, Point y)
-        {
-            Console.WriteLine(x);
-            return true;
-        }
 
     }
 }

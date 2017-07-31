@@ -11,13 +11,14 @@ namespace Set
     /// set collection
     /// </summary>
     /// <typeparam name="T">define type of elements in set</typeparam>
-    public class Set<T> : ISet<T> where T : class, IEquatable<T>
+    public class Set<T> : ISet<T> where T : class
     {
         #region fields&properties
 
         private T[] array;
         private int capacity = 8;
         private int count;
+        private IEqualityComparer<T> equalityComparer;
 
         /// <summary>
         /// number of elements in queue
@@ -41,6 +42,18 @@ namespace Set
         public Set()
         {
             array = new T[capacity];
+            equalityComparer = EqualityComparer<T>.Default;
+        }
+
+        /// <summary>
+        /// initializes a new instance of class with the default initial capacity and comparer
+        /// </summary>
+        /// <param name="comparer">equality comparer</param>
+        /// <exception cref="ArgumentNullException">throws when comparer is null</exception>
+        public Set(IEqualityComparer<T> comparer) : this()
+        {
+            if (ReferenceEquals(comparer, null)) throw new ArgumentNullException($"{nameof(comparer)} is null");
+            equalityComparer = comparer;
         }
 
         /// <summary>
@@ -53,6 +66,20 @@ namespace Set
             if (capacity < 0) throw new ArgumentException($"{nameof(capacity)} can't be less than zero");
             this.capacity = capacity;
             array = new T[capacity];
+            equalityComparer = EqualityComparer<T>.Default;
+        }
+
+        /// <summary>
+        /// initializes a new instance of class with the specified initial capacity and comparer
+        /// </summary>
+        /// <param name="capacity">initial capacity</param>
+        /// <param name="comparer">equality comparer</param>
+        /// <exception cref="ArgumentException">throws when capacity is invalid</exception>
+        /// <exception cref="ArgumentNullException">throws when comparer is null</exception>
+        public Set(int capacity, IEqualityComparer<T> comparer) : this(capacity)
+        {
+            if (ReferenceEquals(comparer, null)) throw new ArgumentNullException($"{nameof(comparer)} is null");
+            equalityComparer = comparer;
         }
 
         /// <summary>
@@ -66,10 +93,35 @@ namespace Set
                 throw new ArgumentNullException($"{nameof(collection)} is null");
             array = new T[collection.Count()];
             capacity = array.Length;
+            equalityComparer = EqualityComparer<T>.Default;
             foreach (var item in collection)
             {
                 Add(item);
             }
+        }
+
+        /// <summary>
+        /// initializes a new instance of class with elements from collection and comparer
+        /// </summary>
+        /// <param name="collection">collection whose elements are copied</param>
+        /// <param name="comparer">equality comparer</param>
+        /// <exception cref="ArgumentNullException">throws when collection is null</exception>
+        /// <exception cref="ArgumentNullException">throws when comparer is null</exception>
+        public Set(IEnumerable<T> collection, IEqualityComparer<T> comparer)
+        {
+            if (ReferenceEquals(comparer, null)) throw new ArgumentNullException($"{nameof(comparer)} is null");
+            if (ReferenceEquals(collection, null))
+                throw new ArgumentNullException($"{nameof(collection)} is null");
+
+            array = new T[collection.Count()];
+            capacity = array.Length;
+            equalityComparer = comparer;
+
+            foreach (var item in collection)
+            {
+                Add(item);
+            }
+
         }
 
         #endregion
@@ -109,7 +161,7 @@ namespace Set
         {
             for (int i = 0; i < count; i++)
             {
-                if (array[i].Equals(item))
+                if (equalityComparer.Equals(array[i], item))
                     return true;
             }
             return false;
@@ -159,7 +211,7 @@ namespace Set
             if (ReferenceEquals(other, null)) throw new ArgumentNullException($"{nameof(other)} is null");
             for (int i = 0; i < count; i++)
             {
-                if (!other.Contains(array[i], EqualityComparer<T>.Default))
+                if (!other.Contains(array[i], equalityComparer))
                 {
                     Remove(array[i]);
                     i--;
@@ -218,7 +270,7 @@ namespace Set
             if (count > other.Count()) return false;
             for (int i = 0; i < count; i++)
             {
-                if (!other.Contains(array[i], EqualityComparer<T>.Default)) return false;
+                if (!other.Contains(array[i], equalityComparer)) return false;
             }
             return true;
         }
@@ -304,11 +356,11 @@ namespace Set
             return IsEqualsSet(this, other) && IsEqualsSet(other, this);
         }
 
-        private static bool IsEqualsSet(IEnumerable<T> a, IEnumerable<T> b)
+        private bool IsEqualsSet(IEnumerable<T> a, IEnumerable<T> b)
         {
             foreach (var item in a)
             {
-                if (!b.Contains(item, EqualityComparer<T>.Default)) return false;
+                if (!b.Contains(item, equalityComparer)) return false;
             }
             return true;
         }
@@ -362,7 +414,7 @@ namespace Set
         public bool Remove(T item)
         {
             if (!Contains(item)) return false;
-            var i = Array.IndexOf(array, item);
+            var i = Array.FindIndex(array, i1 => equalityComparer.Equals(i1, item));
             array[i] = array[count - 1];
             array[count - 1] = default(T);
             count--;

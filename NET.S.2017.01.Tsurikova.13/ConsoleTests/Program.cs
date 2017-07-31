@@ -54,7 +54,10 @@ namespace ConsoleTests
             //}
 
             Set<Point> set = new Set<Point>(new[]{new Point(1,1), new Point(2,2),
-                new Point(3,3), new Point(3,3) });
+                new Point(3,3), new Point(3,3) }, new PointEqualityComparer());
+
+            //Console.WriteLine(set.IsEqualElements(new Point(1, 2), new Point(1, 2)));
+            
             //Set<Point> set = new Set<Point>();
             //Set<Point> set = new Set<Point>(3);
             Console.WriteLine(set);
