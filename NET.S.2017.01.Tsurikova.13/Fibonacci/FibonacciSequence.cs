@@ -21,15 +21,20 @@ namespace Fibonacci
         public static IEnumerable<BigInteger> Generate(int number)
         {
             if (number < 0) throw new ArgumentException($"{nameof(number)} can't be negative");
-            BigInteger a = -1;
-            BigInteger b = 1;
+            return GenerateHelper();
 
-            for (int i = 0; i < number; i++)
+            IEnumerable<BigInteger> GenerateHelper()
             {
-                BigInteger sum = a + b;
-                a = b;
-                b = sum;
-                yield return sum;
+                BigInteger a = -1;
+                BigInteger b = 1;
+
+                for (int i = 0; i < number; i++)
+                {
+                    BigInteger sum = a + b;
+                    a = b;
+                    b = sum;
+                    yield return sum;
+                }
             }
         }
     }
