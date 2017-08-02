@@ -16,8 +16,11 @@ namespace Queue
         #region fields&property
 
         private T[] array;
+        private int head;
+        private int tail;
         private int capacity = 8;
         private int count;
+        private int version;
 
         /// <summary>
         /// number of elements in queue
@@ -78,9 +81,33 @@ namespace Queue
             if (count == capacity)
             {
                 capacity *= 2;
-                Array.Resize(ref array, capacity);
+                Resize(capacity);
             }
-            array[count++] = item;
+            array[tail] = item;
+            tail = (tail + 1) % capacity;
+            count++;
+            version++;
+        }
+
+        private void Resize(int capacity)
+        {
+            T[] newArray = new T[capacity];
+
+            if (count > 0)
+            {
+                if (head < tail)
+                    Array.Copy(array, head, newArray, 0, count);
+                else
+                {
+                    Array.Copy(array, head, newArray, 0, array.Length - head);
+                    Array.Copy(array, 0, newArray, array.Length - head, tail);
+                }
+            }
+
+            array = newArray;
+            head = 0;
+            tail = count == capacity ? 0 : count;
+            version++;
         }
 
         /// <summary>
@@ -91,12 +118,12 @@ namespace Queue
         public T Dequeue()
         {
             if (count == 0) throw new InvalidOperationException("queue is empty");
-            T item = array[0];
-            for (int i = 1; i < count; i++)
-            {
-                array[i - 1] = array[i];
-            }
-            array[count--] = default(T);
+
+            T item = array[head];
+            array[head] = default(T);
+            head = (head + 1) % capacity;
+            count--;
+            version++;
             return item;
         }
 
@@ -108,7 +135,7 @@ namespace Queue
         public T Peek()
         {
             if (count == 0) throw new InvalidOperationException("queue is empty");
-            return array[0];
+            return array[head];
         }
 
         #endregion
@@ -123,12 +150,16 @@ namespace Queue
         public bool Contains(T item)
         {
             EqualityComparer<T> equialityComparer = EqualityComparer<T>.Default;
-            for (int i = 0; i < count; i++)
+            int index = head;
+
+            for (int counter = count; counter > 0; counter--)
             {
-                if (ReferenceEquals(array[i], item)) return true;
-                if (equialityComparer.Equals(array[i], item))
+                if (ReferenceEquals(array[index], item)) return true;
+                if (equialityComparer.Equals(array[index], item))
                     return true;
+                index = (index + 1) % capacity;
             }
+
             return false;
         }
 
@@ -137,8 +168,18 @@ namespace Queue
         /// </summary>
         public void Clear()
         {
-            Array.Clear(array, 0, count);
+            if (head < tail)
+                Array.Clear(array, 0, count);
+            else
+            {
+                Array.Clear(array, head, capacity - head);
+                Array.Clear(array, 0, tail);
+            }
+
+            head = 0;
+            tail = 0;
             count = 0;
+            version++;
         }
 
         /// <summary>
@@ -152,11 +193,16 @@ namespace Queue
         {
             if (ReferenceEquals(array, null)) throw new ArgumentNullException($"{nameof(array)} is null");
             if (arrayIndex < 0) throw new ArgumentException($"{nameof(arrayIndex)} can't be less than 0");
-            for (int i = 0; i < count; i++)
-            {
-                if (arrayIndex + i >= array.Length) break;
-                array[arrayIndex + i] = this.array[i];
-            }
+
+            int numOfElem = array.Length - arrayIndex < count ? array.Length - arrayIndex : count;
+            if (numOfElem == 0) return;
+
+            int fromHead = capacity - head < numOfElem ? capacity - head : numOfElem;
+            Array.Copy(this.array, head, array, arrayIndex, fromHead);
+
+            int fromStart = numOfElem - fromHead;
+            if (fromStart <= 0) return;
+            Array.Copy(this.array, 0, array, arrayIndex + capacity - head, fromStart);
         }
 
         /// <summary>
@@ -166,7 +212,15 @@ namespace Queue
         public T[] ToArray()
         {
             T[] newArray = new T[count];
-            Array.Copy(array, newArray, count);
+
+            if (head < tail)
+                Array.Copy(array, head, newArray, 0, count);
+            else
+            {
+                Array.Copy(array, head, newArray, 0, capacity - head);
+                Array.Copy(array, 0, newArray, capacity - head, tail);
+            }
+
             return newArray;
         }
 
@@ -176,28 +230,37 @@ namespace Queue
         /// returns enumerator
         /// </summary>
         /// <returns>enumerator</returns>
-        public IEnumerator<T> GetEnumerator() => new QueueEnumerator(this);
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        public QueueEnumerator GetEnumerator() => new QueueEnumerator(this);
+
         #region enumerator
 
-        private struct QueueEnumerator : IEnumerator<T>
+        public struct QueueEnumerator : IEnumerator<T>
         {
             private readonly Queue<T> queue;
             private int index;
+            private int version;
 
             public QueueEnumerator(Queue<T> collection) : this()
             {
                 queue = collection;
                 index = -1;
+                version = queue.version;
             }
 
             /// <summary>
             /// moves enumerator to the next element
             /// </summary>
             /// <returns>true if it's possible, otherwise false</returns>
-            public bool MoveNext() => ++index < queue.Count;
+            public bool MoveNext()
+            {
+                if (version != queue.version)
+                    throw new InvalidOperationException("queue was modified");
+                return ++index < queue.Count;
+            }
 
             /// <summary>
             /// returns element in current position
@@ -214,7 +277,12 @@ namespace Queue
 
             object IEnumerator.Current => Current;
 
-            void IEnumerator.Reset() => index = -1;
+            void IEnumerator.Reset()
+            {
+                if (version != queue.version)
+                    throw new InvalidOperationException("queue was modified");
+                index = -1;
+            }
 
             void IDisposable.Dispose()
             {

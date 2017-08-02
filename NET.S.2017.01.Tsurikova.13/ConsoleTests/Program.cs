@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fibonacci;
 using System.Numerics;
-using Queue;
 using Set;
 
 namespace ConsoleTests
@@ -13,33 +14,51 @@ namespace ConsoleTests
     {
         static void Main(string[] args)
         {
-            //Queue<string> queue= new Queue<string>(new []{"cat Ginger", "cat Vasya", "dog Rex"});
-            //Console.WriteLine($"3 {queue.Count}");
-            //queue.Enqueue("crocodile Gena");
-            //Console.WriteLine($"Ginger {queue.Peek()}");
-            //Console.WriteLine($"Ginger {queue.Dequeue()}");
-            //Console.WriteLine();
-            //foreach (var item in queue)
+            Queue.Queue<string> queue= new Queue.Queue<string>(new []{"cat Ginger", "cat Vasya", "dog Rex"});
+            //IEnumerator<string> en = queue.GetEnumerator();
+            //while (en.MoveNext())
             //{
-            //    Console.WriteLine(item);
+            //    Console.WriteLine(en.Current);
             //}
-            //Console.WriteLine($"true {queue.Contains("cat Vasya")}");
+            //en.Reset();
             //Console.WriteLine();
-            //string[] animals = queue.ToArray();
-            //Array.ForEach(animals, Console.WriteLine);
+            //while (en.MoveNext())
+            //{
+            //    Console.WriteLine(en.Current);
+            //}
+            //en.Reset();
             //Console.WriteLine();
-            //animals[0] = null;
-            //queue.СоруТо(animals, 1);
-            //Array.ForEach(animals, Console.WriteLine);
-            //queue.Clear();
-            //Console.WriteLine(queue.Count);
-
-            
+            Console.WriteLine($"3 {queue.Count}");
+            //queue.Enqueue("crocodile Gena");
+            //while (en.MoveNext())
+            //{
+            //    Console.WriteLine(en.Current);
+            //}
+            Console.WriteLine($"Ginger {queue.Peek()}");
+            Console.WriteLine($"Ginger {queue.Dequeue()}");
+            queue.Enqueue("crocodile Gena");
             Console.WriteLine();
-            foreach (BigInteger VARIABLE in FibonacciSequence.Generate(1000))
+            foreach (var item in queue)
             {
-                Console.WriteLine(VARIABLE);
+                Console.WriteLine(item);
             }
+            Console.WriteLine($"true {queue.Contains("cat Vasya")}");
+            Console.WriteLine();
+            string[] animals = queue.ToArray();
+            Array.ForEach(animals, Console.WriteLine);
+            Console.WriteLine();
+            animals[0] = null;
+            queue.СоруТо(animals, 1);
+            Array.ForEach(animals, Console.WriteLine);
+            queue.Clear();
+            Console.WriteLine(queue.Count);
+
+
+            //Console.WriteLine();
+            //foreach (BigInteger VARIABLE in FibonacciSequence.Generate(1000))
+            //{
+            //    Console.WriteLine(VARIABLE);
+            //}
 
             //Set<Point> set = new Set<Point>(new[]{new Point(1,1), new Point(2,2),
             //    new Point(3,3), new Point(3,3) }, new PointEqualityComparer());
